@@ -1,0 +1,69 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+@theme {
+	--font-sans: 'Noto Sans', sans-serif;
+	--font-serif: 'Noto Serif', serif;
+	--font-mono: 'Noto Sans Mono', monospace;
+
+	--color-green-50: #effdf5;
+	--color-green-100: #d9fbe8;
+	--color-green-200: #b3f5d1;
+	--color-green-300: #75edae;
+	--color-green-400: #00dc82;
+	--color-green-500: #00c16a;
+	--color-green-600: #00a155;
+	--color-green-700: #007f45;
+	--color-green-800: #016538;
+	--color-green-900: #0a5331;
+	--color-green-950: #052e16;
+}
+
+/* main.css */
+@custom-variant touch (@media (pointer: coarse));
+@custom-variant no-touch (@media (pointer: fine));
+
+/*
+ * Nuxt UI's `--ui-header-height` only covers `UDashboardNavbar` (60px). Pages
+ * with a `UDashboardToolbar` below it (54px, borders included) need that
+ * accounted for too — most visibly on `UError`, whose own
+ * `min-h-[calc(100vh-var(--ui-header-height))]` otherwise overshoots the
+ * panel body's real available height by the toolbar's height, forcing a
+ * scrollbar on what's meant to be a full, non-scrolling block.
+ *
+ * Can't just do `--ui-header-height: calc(var(--ui-header-height) + 54px)`
+ * inline where it's needed — a custom property referencing itself in its own
+ * declaration is a cycle per the CSS Custom Properties spec, and a cycle
+ * computes to nothing, not the inherited value. One extra named property
+ * breaks the cycle. Use on any element (or ancestor) whose descendants need
+ * to size against the navbar+toolbar chrome instead of just the navbar:
+ *   style="--ui-header-height: var(--ui-full-header-height)"
+ * 60px = header height
+ * 54px = toolbar height (+ borders)
+ * 3rem = p-6 padding on body
+ */
+:root {
+	--ui-full-header-height: calc(60px + 54px + 3rem);
+}
+
+/* shake animation */
+@theme {
+	--animate-shake: shake 2500ms ease-in-out infinite;
+	@keyframes shake {
+		0%,
+		3%,
+		15%,
+		100% {
+			transform: rotate(0deg);
+		}
+		6% {
+			transform: rotate(-8deg);
+		}
+		9% {
+			transform: rotate(8deg);
+		}
+		12% {
+			transform: rotate(-8deg);
+		}
+	}
+}
