@@ -1,5 +1,6 @@
 import type { TableColumn } from '@nuxt/ui';
-import { h, resolveComponent } from 'vue';
+import { h } from 'vue';
+import { UBadge } from '#components';
 import { formatBytes } from './dummy';
 import type { Activation } from './dummy';
 
@@ -31,8 +32,6 @@ export const recentColumns: TableColumn<Activation>[] = [
 		accessorKey: 'status',
 		header: 'Status',
 		cell: ({ row }) => {
-			// Resolved at render time: resolveComponent only works inside render or setup.
-			const UBadge = resolveComponent('UBadge');
 			return h(
 				UBadge,
 				{ variant: 'subtle', color: statusColor[row.original.status], class: 'capitalize' },
