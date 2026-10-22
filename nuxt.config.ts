@@ -1,11 +1,36 @@
 import { fileURLToPath } from 'node:url';
 
+const layerDir = fileURLToPath(new URL('./', import.meta.url));
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 	compatibilityDate: '2025-07-15',
-	modules: ['@nuxt/ui', '@nuxt/eslint'],
+	modules: [
+		'@nuxt/ui',
+		'@nuxt/eslint',
+		// An app extending a local checkout (`extends: ['../central-ui-layer']`) would otherwise resolve the layer's
+		// bare imports from this repo's node_modules: a second Vue, and a crash in renderSlot. Vite's `resolve.dedupe`
+		// doesn't help (rolldown's resolver ignores it here). Resolve them from the app instead, as a `github:`
+		// download (no node_modules of its own) already does; the deps are peerDependencies anyway.
+		(_, nuxt) => {
+			const from = `${nuxt.options.rootDir}/package.json`;
+			nuxt.hook('vite:extendConfig', (config) => {
+				config.plugins?.push({
+					name: 'central-ui-layer:deps-from-app',
+					enforce: 'pre',
+					resolveId(id: string, importer: string | undefined, options: { isEntry: boolean }) {
+						if (!importer?.startsWith(layerDir) || importer.includes('/node_modules/')) return;
+						if (/^[./\0#~]|^[a-z]+:/i.test(id)) return;
+						return this.resolve(id, from, { ...options, skipSelf: true });
+					},
+				});
+			});
+		},
+	],
 	// Absolute, so it resolves when an app extends this layer from another directory.
 	css: [fileURLToPath(new URL('./app/assets/css/main.css', import.meta.url))],
+	// The layer's types for apps: `import type { AppNavItem } from '#central-ui'`.
+	alias: { '#central-ui': `${layerDir}app/types/app-config` },
 
 	// Bundles `carbon:*` icons at build time; without it @nuxt/icon fetches each at
 	// runtime, which races SSR on cold start and logs "failed to load icon". `scan`
