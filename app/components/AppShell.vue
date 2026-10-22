@@ -34,8 +34,8 @@
 			collapsible
 			:collapsed-size="3"
 			:min-size="10"
-			:default-size="13"
-			:max-size="16"
+			:default-size="11"
+			:max-size="12"
 			:ui="{
 				root: 'bg-elevated/75 border-default transition-all',
 				footer: 'lg:border-t border-default  text-xs',

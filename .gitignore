@@ -30,3 +30,4 @@ logs
 .vscode/settings.json
 .mcp.json
 CLAUDE.local.md
+.publish.sh
