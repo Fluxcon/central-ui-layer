@@ -1,0 +1,3 @@
+# Left out of `git archive` and GitHub tarballs (what `github:` extends downloads). It references the playground's
+# generated .nuxt/tsconfig.*.json, which a download lacks, so Vite fails every layer .ts transform (TSCONFIG_ERROR).
+tsconfig.json export-ignore
