@@ -5,7 +5,8 @@ README.md documents the consumer contract (`app.*` config keys, slots).
 
 ## Commands
 
-- `pnpm install`, `pnpm dev` (playground), `pnpm portless:dev` (playground at `https://ui.localhost`), `pnpm build` (playground build), `pnpm check` (vue-tsc + eslint)
+- `pnpm install`, `pnpm dev` (playground), `pnpm build` (playground build), `pnpm check` (vue-tsc + eslint)
+- Only if local testing needs https: `pnpm portless:dev` (playground at `https://ui.localhost`). Check with `command -v portless`; install with `pnpm add -g portless`.
 
 ## Rules
 
