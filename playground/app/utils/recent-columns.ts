@@ -1,6 +1,6 @@
 import type { TableColumn } from '@nuxt/ui';
 import { h } from 'vue';
-import { UBadge } from '#components';
+import { UBadge, ULink } from '#components';
 import { formatBytes } from './dummy';
 import type { Activation } from './dummy';
 
@@ -14,7 +14,7 @@ export const recentColumns: TableColumn<Activation>[] = [
 	{
 		accessorKey: 'id',
 		header: 'ID',
-		cell: ({ row }) => '#' + row.original.id,
+		cell: ({ row }) => h(ULink, { to: `/activations/${row.original.id}` }, () => '#' + row.original.id),
 	},
 	{
 		accessorKey: 'date',

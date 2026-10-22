@@ -14,6 +14,7 @@ IWS proxy v2 `extends:` it instead of copying.
 | `app/app.vue` | `UApp` (toaster top-centre), loading indicator, `NuxtLayout` |
 | `app/layouts/default.vue` | renders `AppShell` with `app.nav` |
 | `app/components/AppShell.vue` | sidebar dashboard shell (props: `items`; slots: `footer-actions`, default) |
+| `app/components/PagePanel.vue` | v4's page frame: navbar (title, back button from two levels deep to the parent crumb, `right` slot) and toolbar (breadcrumbs left, `actions` slot right). Props `id`, `title`, `breadcrumbs` |
 | `app/components/BrandLogo.vue` | logo + wordmark, from `app.company` / `app.name` / `app.home` / `app.nameClass` / `app.icon` |
 | `app/components/BrandIcon.vue` | the shared ring-and-dot mark, cut by up to three legs. Props `color` (Nuxt UI colour), `legs` (degrees) |
 | `app/components/UserCard.vue` | colour-mode toggle + user menu. Props `name`, `email`, `image`, `profile`; emits `logout`, `profile` |
@@ -72,7 +73,22 @@ export default defineAppConfig({
   (arrays merge with the layer's) and map them in the app's `app.config.ts`.
 - **Dynamic nav or footer buttons** (SBDA's per-permission nav and sign-out button): write your own `app/layouts/default.vue`:
   `<AppShell :items="links"><template #footer-actions><UButton .../></template><slot /></AppShell>`.
-- User menu: `<UserCard :name :email :image profile @logout="signOut" />` in a navbar `#right` slot; the app does the sign-out.
+- **Pages**: wrap each page in `PagePanel` instead of writing `UDashboardPanel` + navbar + toolbar by hand:
+  ```vue
+  <PagePanel id="account" :title="`Manage: ${name}`" :breadcrumbs="[
+  	{ label: 'Dashboard', icon: 'carbon:workspace', to: '/' },
+  	{ label: 'Accounts', icon: 'carbon:building', to: '/accounts' },
+  	{ label: name, icon: 'carbon:store' },
+  ]">
+  	<template #right><UserCard ... /></template>
+  	<template #actions><UButton label="Edit" /></template>
+  	<!-- page body -->
+  </PagePanel>
+  ```
+  The back chevron appears only from two path levels deep (`/account/30389`) and links to the second-to-last crumb, so
+  give a deep page breadcrumbs. The toolbar renders only with breadcrumbs or `#actions`. Don't add a
+  `UDashboardSidebarCollapse` to the navbar: the sidebar footer has one.
+- User menu: `<UserCard :name :email :image profile @logout="signOut" />` in `PagePanel`'s `#right` slot; the app does the sign-out.
 
 ## Left out, and why
 
@@ -93,4 +109,6 @@ Never extend `#main`.
 
 ## Develop
 
-`pnpm install`, then `pnpm dev` (playground on :3000), `pnpm build`, `pnpm check` (vue-tsc + eslint).
+`pnpm install`, then `pnpm dev` (playground on :3000, or `pnpm portless:dev` for `https://ui.localhost`), `pnpm build`,
+`pnpm check` (vue-tsc + eslint). The playground home is a dashboard demo; its table IDs open `/activations/:id`, the
+two-level page that shows `PagePanel`'s back button.
