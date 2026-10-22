@@ -8,14 +8,16 @@ IWS proxy v2 `extends:` it instead of copying.
 
 | Path | What |
 |---|---|
-| `nuxt.config.ts` | `@nuxt/ui` + `@nuxt/eslint`, `main.css`, icon clientBundle, `ui.theme.colors` (9 semantic colours), `lang`/viewport head |
+| `nuxt.config.ts` | `@nuxt/ui` + `@nuxt/eslint`, `main.css`, icon clientBundle, `ui.theme.colors` (9 semantic colours), `lang`/viewport head, favicon link |
 | `app/app.config.ts` | v4's `ui` defaults (colours with **primary = orange**, Carbon icons, link/button/toast variants) and the `app` shell defaults |
 | `app/assets/css/main.css` | fonts (Noto), green palette, `touch`/`no-touch` variants, `--ui-full-header-height`, `shake` animation |
 | `app/app.vue` | `UApp` (toaster top-centre), loading indicator, `NuxtLayout` |
 | `app/layouts/default.vue` | renders `AppShell` with `app.nav` |
 | `app/components/AppShell.vue` | sidebar dashboard shell (props: `items`; slots: `footer-actions`, default) |
-| `app/components/BrandLogo.vue` | logo + wordmark, from `app.company` / `app.name` / `app.home` / `app.nameClass` |
+| `app/components/BrandLogo.vue` | logo + wordmark, from `app.company` / `app.name` / `app.home` / `app.nameClass` / `app.icon` |
+| `app/components/BrandIcon.vue` | the shared ring-and-dot mark, cut by up to three legs. Props `color` (Nuxt UI colour), `legs` (degrees) |
 | `app/components/UserCard.vue` | colour-mode toggle + user menu. Props `name`, `email`, `image`, `profile`; emits `logout`, `profile` |
+| `server/routes/favicon.svg.ts` | `/favicon.svg`: the app's BrandIcon from `app.icon`, as a standalone SVG |
 | `app/composables/` | `useAppToast`, `useDebounced`, `useLocalStorage` |
 | `app/utils/api-error.ts` | `apiErrorMessage` (h3 error body to toast text) |
 
@@ -42,7 +44,8 @@ export default defineAppConfig({
 		company: 'Fluxcon',                      // small line above it, and the footer copyright; '' hides the small line
 		home: '/',                               // logo link
 		storageKey: 'central-dashboard',         // sidebar state in localStorage; unique per app
-		nameClass: 'text-2xl tracking-widest',   // optional; SBDA uses 'text-base tracking-normal'
+		nameClass: 'text-[12cqi] tracking-widest', // optional; cqi = % of the wordmark column width; SBDA uses 'text-base tracking-normal'
+		icon: { color: 'primary', legs: [45, 135] }, // this app's BrandIcon variant, logo and favicon; see below
 		nav: [
 			{ label: 'Dashboard', icon: 'carbon:workspace', to: '/' },
 			{ label: 'Accounts', type: 'label' },
@@ -54,8 +57,17 @@ export default defineAppConfig({
 
 - `nav` items are Nuxt UI `NavigationMenuItem`s plus `match`: `'exact'` or a path prefix. Default is exact for `/`, else
   prefix of `to`. An explicit `active` always wins. Label items (`type: 'label'`) pass through.
-- Arrays in `app.nav` replace the layer's (empty) default, so list everything.
-- The app still owns `app.head.title` and the favicon (`public/favicon.svg`), its pages, login, auth and middleware.
+- **Brand icon**: every app shows the same mark, a ring with a centre dot, in its own primary colour, cut by different
+  legs so users can tell the apps apart at a glance. Set it once in `app.icon`; the sidebar logo and `/favicon.svg` both
+  read it. `color` is a Nuxt UI colour key and stays `'primary'`, so the icon follows `ui.colors.primary`. `legs` are up
+  to three angles in degrees, clockwise from north; missing legs repeat the last one, so two angles draw a two-legged
+  icon, and none draws three at 0/120/240. central-v4 uses `[45, 135]`. Pick angles no other app uses.
+  Arrays in app config concatenate with the layer's, which is why the layer leaves `legs` (and `nav`) empty.
+- **Favicon**: the layer adds `<link rel="icon" href="/favicon.svg">`, served from `app.icon` with the 500 shade in light
+  mode and 400 in dark (Nuxt UI's primary). Delete the app's own `public/favicon.svg` and its `link`: a static file at
+  that path wins over the route. Browsers cache favicons hard (the route sends a 1-day `max-age`).
+- To show the icon elsewhere (login, empty states), use `<BrandIcon color="primary" :legs="[45, 135]" />`.
+- The app still owns `app.head.title`, its pages, login, auth and middleware.
 - Extra colour aliases (v4's `fluxcon`, `global`, `terrace`): add them to `ui.theme.colors` in the app's `nuxt.config.ts`
   (arrays merge with the layer's) and map them in the app's `app.config.ts`.
 - **Dynamic nav or footer buttons** (SBDA's per-permission nav and sign-out button): write your own `app/layouts/default.vue`:
@@ -70,7 +82,7 @@ export default defineAppConfig({
 - **Company badge colours** (`fluxcon`, `global`, `terrace`): v4 domain data. Left to v4.
 - **`material-icon-theme:google`** from the icon bundle: only the Google login button uses it; v4 adds it to its own
   `icon.clientBundle.icons`.
-- **Head title, favicon, runtimeConfig, `ssr`, nitro preset**: per app.
+- **Head title, runtimeConfig, `ssr`, nitro preset**: per app.
 - `useStockPlace`, `format-phone-number`, `audit-actions`, `tag-case`, `stock-tree`, `account-match`, `auth-client`,
   `auth.global` middleware, `error.vue`: v4 domain or auth.
 

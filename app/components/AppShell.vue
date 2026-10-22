@@ -33,12 +33,12 @@
 			resizable
 			collapsible
 			:collapsed-size="3"
-			:min-size="16"
-			:default-size="16"
+			:min-size="10"
+			:default-size="13"
 			:max-size="16"
 			:ui="{
-				root: 'bg-elevated/50 transition-all',
-				footer: 'lg:border-t lg:border-default text-xs',
+				root: 'bg-elevated/75 border-default transition-all',
+				footer: 'lg:border-t border-default  text-xs',
 			}"
 		>
 			<template #header="{ collapsed }">
@@ -55,7 +55,8 @@
 					:ui="{
 						label: 'uppercase font-thin font-mono',
 						list: `flex flex-col gap-px ${collapsed && 'items-center '}`,
-						link: 'p-2 hover:bg-primary/50 hover:text-highlighted rounded-md ',
+						link: 'p-2 group hover:bg-primary hover:text-inverted rounded-md ',
+						linkLeadingIcon: 'group-hover:text-inverted',
 					}"
 				/>
 			</template>

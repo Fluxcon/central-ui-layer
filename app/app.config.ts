@@ -5,7 +5,9 @@ export default defineAppConfig({
 		company: 'Fluxcon',
 		home: '/',
 		storageKey: 'app-dashboard',
-		nameClass: 'text-2xl tracking-widest',
+		nameClass: 'text-[12cqi] tracking-widest',
+		// `legs` stays empty: app config merges arrays by concatenating, so a default here would prepend to the app's.
+		icon: { color: 'primary', legs: [] as number[] },
 		nav: [],
 	},
 	ui: {

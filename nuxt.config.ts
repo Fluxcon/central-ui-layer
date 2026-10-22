@@ -38,6 +38,8 @@ export default defineNuxtConfig({
 		head: {
 			htmlAttrs: { lang: 'en' },
 			meta: [{ charset: 'utf-8' }, { name: 'viewport', content: 'width=device-width, initial-scale=1' }],
+			// Served by server/routes/favicon.svg.ts from `app.icon`.
+			link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
 		},
 	},
 });

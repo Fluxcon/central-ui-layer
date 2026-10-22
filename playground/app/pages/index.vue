@@ -13,13 +13,18 @@
 			<UDashboardToolbar>
 				<template #left>
 					<USelect v-model="days" :items="ranges" variant="ghost" icon="i-lucide-calendar" />
-					<USelect v-model="period" :items="periods" variant="ghost" :ui="{ value: 'capitalize', itemLabel: 'capitalize' }" />
+					<USelect
+						v-model="period"
+						:items="periods"
+						variant="ghost"
+						:ui="{ value: 'capitalize', itemLabel: 'capitalize' }"
+					/>
 				</template>
 			</UDashboardToolbar>
 		</template>
 
 		<template #body>
-			<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+			<UPageGrid class="gap-4 sm:gap-6 lg:gap-px lg:grid-cols-4">
 				<UPageCard
 					v-for="stat in stats"
 					:key="stat.title"
@@ -32,10 +37,10 @@
 						leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
 						title: 'font-normal text-muted text-xs uppercase',
 					}"
-					class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
+					class="hover:z-1 lg:rounded-none last:rounded-r-lg first:rounded-l-lg"
 				>
 					<div class="flex items-center gap-2">
-						<span class="text-2xl font-semibold text-highlighted">{{ stat.value }}</span>
+						<span class="font-semibold text-highlighted text-2xl">{{ stat.value }}</span>
 						<UBadge :color="stat.variation > 0 ? 'success' : 'error'" variant="subtle" class="text-xs">
 							{{ stat.variation > 0 ? '+' : '' }}{{ stat.variation }}%
 						</UBadge>
@@ -72,7 +77,9 @@
 
 	// Mirrors the template: short windows only make sense daily, long ones weekly/monthly.
 	const periods = computed<Period[]>(() =>
-		days.value <= 7 ? ['daily'] : days.value <= 30 ? ['daily', 'weekly'] : ['weekly', 'monthly'],
+		days.value <= 7 ? ['daily']
+		: days.value <= 30 ? ['daily', 'weekly']
+		: ['weekly', 'monthly'],
 	);
 	watch(periods, (p) => {
 		if (!p.includes(period.value)) period.value = p[0]!;
