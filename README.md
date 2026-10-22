@@ -31,7 +31,7 @@ Contents: What is in it · Using it (What the app provides) · Left out, and why
 ```ts
 // nuxt.config.ts
 extends: ['../central-ui-layer']                                // local checkout, while working on the layer
-extends: ['github:Fluxcon/central-ui-layer#v0.0.2']             // pinned tag; private repo needs GIGET_AUTH=<token>
+extends: ['github:Fluxcon/central-ui-layer#v0.0.3']             // pinned tag; private repo needs GIGET_AUTH=<token>
 ```
 
 A local checkout needs nothing else: the layer resolves its own bare imports (`vue`, `@nuxt/ui`, ...) from the app, so

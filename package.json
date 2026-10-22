@@ -1,6 +1,6 @@
 {
 	"name": "central-ui-layer",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"type": "module",
 	"private": true,
 	"main": "./nuxt.config.ts",
