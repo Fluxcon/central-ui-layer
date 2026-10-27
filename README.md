@@ -31,15 +31,17 @@ Contents: What is in it · Using it (What the app provides) · Left out, and why
 ```ts
 // nuxt.config.ts
 extends: ['../central-ui-layer']                                // local checkout, while working on the layer
-extends: ['github:Fluxcon/central-ui-layer#v0.0.4']             // pinned tag; private repo needs GIGET_AUTH=<token>
+extends: ['github:Fluxcon/central-ui-layer#v0.0.5']             // pinned tag; private repo needs GIGET_AUTH=<token>
 ```
 
 A local checkout needs nothing else: the layer resolves its own bare imports (`vue`, `@nuxt/ui`, ...) from the app, so
 the page gets the app's single Vue even though this repo has its own `node_modules`. For vue-tsc the layer maps `vue` to the
 app's in the generated tsconfig (from v0.0.4). Commit only the pinned tag.
 
-The app must itself depend on `nuxt`, `@nuxt/ui`, `tailwindcss`, `@iconify-json/carbon` (and `@iconify-json/material-icon-theme`
-if it uses the Google icon), because a layer's own dependencies are not installed for the consumer.
+The app must itself depend on `nuxt`, `@nuxt/ui`, `tailwindcss`, `vue`, `@iconify-json/carbon` (and `@iconify-json/material-icon-theme`
+if it uses the Google icon), because a layer's own dependencies are not installed for the consumer. `vue` is needed from v0.0.4:
+vue-tsc's mapping points at the app's `node_modules/vue`, which pnpm creates only for a direct dependency (vue through `nuxt`
+alone gives TS2307/TS2339 in the layer's files). The layer warns at `nuxt prepare` when it's missing.
 
 ### What the app provides
 

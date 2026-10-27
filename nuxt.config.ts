@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const layerDir = fileURLToPath(new URL('./', import.meta.url));
@@ -17,8 +18,13 @@ export default defineNuxtConfig({
 			// Same for vue-tsc: layer files typed against this repo's `vue` miss Nuxt's `declare module 'vue'`
 			// augmentations (template auto-imports, TS2339). Not for the playground, which uses this repo's `vue`.
 			if (!`${nuxt.options.rootDir}/`.startsWith(layerDir)) {
+				const appVue = `${nuxt.options.rootDir}/node_modules/vue`;
+				// Under pnpm, vue reached only through nuxt isn't in the app's node_modules: the mapping then points nowhere.
+				if (!existsSync(appVue)) {
+					console.warn(`[central-ui-layer] ${appVue} not found: add \`vue\` to the app's dependencies, or vue-tsc fails in the layer's files.`);
+				}
 				nuxt.hook('prepare:types', ({ tsConfig }) => {
-					((tsConfig.compilerOptions ??= {}).paths ??= {}).vue = [`${nuxt.options.rootDir}/node_modules/vue`];
+					((tsConfig.compilerOptions ??= {}).paths ??= {}).vue = [appVue];
 				});
 			}
 			nuxt.hook('vite:extendConfig', (config) => {
