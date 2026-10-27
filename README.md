@@ -16,7 +16,7 @@ Contents: What is in it · Using it (What the app provides) · Left out, and why
 | `app/app.vue` | `UApp` (toaster top-centre), loading indicator, `NuxtLayout` |
 | `app/layouts/default.vue` | renders `AppShell` with `app.nav` |
 | `app/components/AppShell.vue` | sidebar dashboard shell (props: `items`; slots: `footer-actions`, default) |
-| `app/components/PagePanel.vue` | v4's page frame: navbar (title, back button from two levels below `app.home` to the parent crumb, `right` slot) and toolbar (breadcrumbs left, `actions` slot right). Props `id`, `title`, `breadcrumbs`, `ui` |
+| `app/components/PagePanel.vue` | v4's page frame: navbar (title, back button from two levels below `app.home` to the parent crumb, `right` slot) and toolbar (breadcrumbs left, `breadcrumbs-after` slot for badges, `actions` slot right). Props `id`, `title`, `breadcrumbs`, `back` (default `true`; `false` hides the back button), `ui` |
 | `app/components/BrandLogo.vue` | logo + wordmark, from `app.company` / `app.name` / `app.home` / `app.nameClass` / `app.icon` |
 | `app/components/LoginBackdrop.vue` | the login page's blurred gradient, a centred default slot for the card, and a colour-mode button. Prop `color`: `'orange'` (v4, IWS) or `'blue'` (SBDA) |
 | `app/components/BrandIcon.vue` | the shared ring-and-dot mark, cut by up to three legs. Props `color` (Nuxt UI colour), `legs` (degrees) |
@@ -31,11 +31,12 @@ Contents: What is in it · Using it (What the app provides) · Left out, and why
 ```ts
 // nuxt.config.ts
 extends: ['../central-ui-layer']                                // local checkout, while working on the layer
-extends: ['github:Fluxcon/central-ui-layer#v0.0.3']             // pinned tag; private repo needs GIGET_AUTH=<token>
+extends: ['github:Fluxcon/central-ui-layer#v0.0.4']             // pinned tag; private repo needs GIGET_AUTH=<token>
 ```
 
 A local checkout needs nothing else: the layer resolves its own bare imports (`vue`, `@nuxt/ui`, ...) from the app, so
-the page gets the app's single Vue even though this repo has its own `node_modules`. Commit only the pinned tag.
+the page gets the app's single Vue even though this repo has its own `node_modules`. For vue-tsc the layer maps `vue` to the
+app's in the generated tsconfig (from v0.0.4). Commit only the pinned tag.
 
 The app must itself depend on `nuxt`, `@nuxt/ui`, `tailwindcss`, `@iconify-json/carbon` (and `@iconify-json/material-icon-theme`
 if it uses the Google icon), because a layer's own dependencies are not installed for the consumer.
@@ -92,11 +93,12 @@ export default defineAppConfig({
   ]">
   	<template #right><UserCard ... /></template>
   	<template #actions><UButton label="Edit" /></template>
+  	<template #breadcrumbs-after><UBadge v-if="account.deleted_at" label="Deleted" color="neutral" variant="subtle" /></template>
   	<!-- page body -->
   </PagePanel>
   ```
   The back chevron appears only from two path levels below `app.home` (`/account/30389`; with IWS's home `/admin`,
-  `/admin/calls/5` but not `/admin/calls`) and links to the second-to-last crumb, so give a deep page breadcrumbs.
+  `/admin/calls/5` but not `/admin/calls`) and links to the second-to-last crumb, so give a deep page breadcrumbs. Pass `:back="false"` when that parent crumb isn't a useful back target (a slideover deep link, a settings tab).
   The toolbar renders only with breadcrumbs or `#actions`. `ui` passes through to `UDashboardPanel`; the body
   already has v4's `scrollbar-gutter-stable pr-2!`, and a `body` you pass adds to it. Don't add a
   `UDashboardSidebarCollapse` to the navbar: the sidebar footer has one.
@@ -129,6 +131,6 @@ Never extend `#main`.
 
 `pnpm install`, then `pnpm dev` (playground on :3000, or `pnpm portless:dev` for `https://ui.localhost`), `pnpm build`,
 `pnpm check` (vue-tsc + eslint). The playground home is a dashboard demo; its table IDs open `/activations/:id`, the
-two-level page that shows `PagePanel`'s back button. `/login` shows `LoginBackdrop` with v4's card (`?color=blue` for
+two-level page that shows `PagePanel`'s back button and a `breadcrumbs-after` badge; `?back=0` hides the back button (`:back="false"`). `/login` shows `LoginBackdrop` with v4's card (`?color=blue` for
 SBDA's). `tsconfig.json` is left out of exports (`.gitattributes`): it points at the playground's generated `.nuxt`,
 which a `github:` download lacks.

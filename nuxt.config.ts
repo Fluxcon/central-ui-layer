@@ -14,6 +14,13 @@ export default defineNuxtConfig({
 		// download (no node_modules of its own) already does; the deps are peerDependencies anyway.
 		(_, nuxt) => {
 			const from = `${nuxt.options.rootDir}/package.json`;
+			// Same for vue-tsc: layer files typed against this repo's `vue` miss Nuxt's `declare module 'vue'`
+			// augmentations (template auto-imports, TS2339). Not for the playground, which uses this repo's `vue`.
+			if (!`${nuxt.options.rootDir}/`.startsWith(layerDir)) {
+				nuxt.hook('prepare:types', ({ tsConfig }) => {
+					((tsConfig.compilerOptions ??= {}).paths ??= {}).vue = [`${nuxt.options.rootDir}/node_modules/vue`];
+				});
+			}
 			nuxt.hook('vite:extendConfig', (config) => {
 				config.plugins?.push({
 					name: 'central-ui-layer:deps-from-app',
